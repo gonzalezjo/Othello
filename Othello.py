@@ -1,3 +1,18 @@
+WELCOME_PROMPT = """
+Othello
+by namozeg
+Welcome to Othello, a two-player tile-flipping game! Take turns placing pieces
+on the board that flank oppponent pieces to capture them and turn them into your
+own. Pieces can be flanked horizontally, vertically, and even diagonally. Note
+that you can only place a piece if it captures at least one opponent piece. If you
+have no available moves, your turn will be skipped. If neither player has an available
+move, the game is over. Whoever has more tiles at the end of the game is the winner.
+
+Good luck! 
+
+For questions, comments, or edits, please email me at namozeg@gmail.com
+"""
+
 board = []
 turn = 1
 
@@ -12,58 +27,48 @@ board[4][4] = "X"
 import os  
 width = os.get_terminal_size().columns - 1
 
-print()
-print("Othello".center(width))
-print("by namozeg".center(width))
-print()
-print("Welcome to Othello, a two-player tile-flipping game! Take turns placing pieces".center(width))
-print("on the board that flank oppponent pieces to capture them and turn them into your".center(width))
-print("own. Pieces can be flanked horizontally, vertically, and even diagonally. Note".center(width))
-print("that you can only place a piece if it captures at least one opponent piece. If you".center(width))
-print("have no available moves, your turn will be skipped. If neither player has an available".center(width))
-print("move, the game is over. Whoever has more tiles at the end of the game is the winner.".center(width))
-
-print("Good luck!".center(width))
-print()
-print("For questions, comments, or edits, please email me at namozeg@gmail.com".center(width))
+# Print prompt
+for line in WELCOME_PROMPT.splitlines():
+  print(line.center(width))
 
 def ask_hints():
-    hint_tracker = 0
-    global hints
-    while hint_tracker == 0:
+    hint_tracker = False
+    global hints # See if you can avoid needing to use this global variable
+    # hint (no pun intended): make ask_hints into "should_give_hints()" and have it return a boolean. 
+    while !hint_tracker:
         print()
-        hints = input("Would you like to enable hints for this game? Please enter Y or N. ")
+        hints = input("Would you like to enable hints for this game? Please enter Y or N. ").lower()
         if len(hints) != 1:
-            print()
-            print("Please enter Y or N.")
-        elif hints == "Y" or hints =="y":
-            print()
-            print("Hints enabled. Available moves will be marked with a '#'.")
-            hint_tracker  = 1
-            hints = 1
-        elif hints == "N" or hints == "n":
-            print()
-            print("Hints disabled. Available moves will not be marked.")
-            hint_tracker  = 1
+            print("\nPlease enter Y or N.")
+        elif hints == "y":
+            print("\nHints enabled. Available moves will be marked with a '#'.")
+            hint_tracker  = True
+            hints = 1 # Use booleans rather than ints. Leaving this as a personal exercise. 
+        elif hints == "n":
+            print("\nHints disabled. Available moves will not be marked.")
+            hint_tracker  = True
             hints = 0
         else:
-            print()
-            print("Please enter Y or N.")
+            print("\nPlease enter Y or N.")
 
-def print_board(board):
+# Mostly okay
+def print_board(board): 
     column_header = [" "]
-    for i in range(8):
+    for i in range(8): 
         column_header.append(str(i + 1))
     print((" ".join(column_header)).center(width))
-    for i in range(1,9):
+    for i in range(1,9): # Try to keep your loops zero-indexed for the sake of consistency.
         print((str(i) + " " + " ".join(board[i - 1])).center(width))
 
 def clear_past_available_moves(board):
-    for i in range(8):
+    for i in range(8): # You might want to use an enumerate based loop here! 
         for j in range(8):
             if board[i][j] == "#":
                 board[i][j] = "-"
 
+# If you search GitHub for Othello or Reversi, you'll see some implementations that might give you ideas to clean this up.
+# You don't need to do any crazy move generator stuff to make this somewhat cleaner, though, if you want to see some
+# crazy move generator techniques, look at the one in Edax. It's stunning. 
 def available_moves(opp_player,player):
     for i in range(8):
         for j in range(7):
@@ -233,7 +238,7 @@ def available_moves(opp_player,player):
                                         count12 += 1
                                     if count12 == k - 1:
                                         board[i + 1][j - 1] = "#"
-    global possible_moves
+    global possible_moves # Try avoiding this if possible
     possible_moves = 0
     for i in range(8):
         for j in range(8):
@@ -241,7 +246,7 @@ def available_moves(opp_player,player):
                 possible_moves += 1
 
 def any_possible_moves():
-    global turn
+    global turn # Try avoiding this if possible
     clear_past_available_moves(board)
     available_moves("X","O")
     store1 = possible_moves
@@ -252,49 +257,47 @@ def any_possible_moves():
         return 0
 
 def place_piece(player):
-    check = 0
+    check = 0 # Use booleans instead of decimals.
     while check == 0:
-        global piece_row
+        global piece_row # Again, try not to have globals.
         global piece_column
         count = 0
         while count == 0:
             print()
-            piece_row = input("Player " + player + ", choose a row in which to place your piece: ")
-            if piece_row.isnumeric() == True:
+            # Use string interpolation
+            piece_row = input("Player " + player + ", choose a row in which to place your piece: ") 
+            if piece_row.isnumeric(): # You can drop the == True 
                 piece_row = int(piece_row)
                 if piece_row <= 8 and piece_row >= 1:
                     piece_row = piece_row - 1
                     count += 1
                 else:
-                    print()
-                    print("Please enter an integer between 1 and 8.")
+                    print("\nPlease enter an integer between 1 and 8.")
             else:
-                print()
-                print("Please enter an integer between 1 and 8.")
+                print("\nPlease enter an integer between 1 and 8.")
         count = 0
         while count == 0:
             print()
             piece_column = input("Player " + player + ", choose a column in which to place your piece: ")
-            if piece_column.isnumeric() == True:
+            if piece_column.isnumeric():
                 piece_column = int(piece_column)
                 if piece_column <= 8 and piece_column >= 1:
                     piece_column = piece_column - 1
                     count += 1
                 else:
-                    print()
-                    print("Please enter an integer between 1 and 8.")
+                    print("\nPlease enter an integer between 1 and 8.")
             else:
-                print()
                 print("Please enter an integer between 1 and 8.")
         if board[piece_row][piece_column] == "#":
             board[piece_row][piece_column] = player
             check += 1
         else:
             print()
-            print("That is not a valid move. Please go again.")
+            print("That is not a valid move. Please try again.")
 
+# I can go through this at a later date, but finals are making this hard. 
 def change_pieces(opp_player,player):
-    global piece_row
+    global piece_row # No globals
     global piece_column
     count1 = 0
     count2 = 0
@@ -468,27 +471,20 @@ def check_board(board):
     if any_possible_moves() == 0:
         Xcount = str(Xcount)
         Ocount = str(Ocount)
-        print()
-        print("X has " + Xcount + " spaces.")
-        print()
-        print("O has " + Ocount + " spaces.")
+        print("\nX has " + Xcount + " spaces.")
+        print("\nO has " + Ocount + " spaces.")
         if Xcount > Ocount:
-            print()
-            print("Player X is the winner!")
+            print("\nPlayer X is the winner!")
         elif Xcount < Ocount:
-            print()
-            print("Player O is the winner!")
+            print("\nPlayer O is the winner!")
         else:
-            print()
-            print("It's a tie!")
+            print("\nIt's a tie!")
         yn_tracker = 0
         while yn_tracker == 0:
-            print()
-            yn = input("Would you like to play again? Please enter Y or N. ")
+            yn = input("\nWould you like to play again? Please enter Y or N. ").lower()
             if len(yn) != 1:
-                print()
-                print("Please enter Y or N.")
-            elif yn == "Y" or yn =="y":
+                print("\nPlease enter Y or N.")
+            elif yn =="y":
                 for x in range(8):
                     for y in range(8):
                         board[x][y] = "-"
@@ -498,14 +494,13 @@ def check_board(board):
                 board[4][4] = "X"
                 turn = 1
                 yn_tracker = 1
-            elif yn =="N" or yn =="n":
+            elif yn =="n":
                 turn  = 0
                 print()
                 print("Goodbye!")
                 yn_tracker = 1
             else:
-                print()
-                print("Please enter Y or N.")
+                print("\nPlease enter Y or N.")
 
 def move(player):
     global turn
@@ -519,7 +514,7 @@ def move(player):
         available_moves(opp_player,player)
         print()
         print_board(board)
-    if hints == 0:
+    else:
         print()
         print_board(board)
         available_moves(opp_player,player)
@@ -530,16 +525,17 @@ def move(player):
         print()
         print("Player " + player + " has no possible moves.")
     turn += 1
+    
+# Main game loop
+ask_hints()
            
 while turn > 0:
-    if any_possible_moves() == 0:
+    if any_possible_moves() == 0: # Bools are your friend
         print()
         print_board(board)
         print()
         print("No moves left!")
         check_board(board)
-    if turn == 1:
-        ask_hints()
     if turn % 2 != 0:
         move("X")
     else:
